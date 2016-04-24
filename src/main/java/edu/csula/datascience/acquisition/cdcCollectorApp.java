@@ -13,7 +13,7 @@ public class cdcCollectorApp {
     public static void main(String[] args) {
         cdcSource source = new cdcSource();
         Collection<Document> list = source.next();
-        cdcCollector collector = new cdcCollector();
+        //cdcCollector collector = new cdcCollector();
         //collector.save(list);
 
     }

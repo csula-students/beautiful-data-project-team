@@ -46,7 +46,8 @@ public class CityDataSource implements Source<Document>{
 
     @Override
     public Collection<Document> next() {
-        String csvFile = "C:\\Users\\jwj96\\Downloads\\Big_Cities_Health_Data_Inventory.csv";
+        String csvFile = "/Users/andrewgarcia/Documents/Big Data Homework 2 Documents/"
+        		+ "Big_Cities_Health_Data_Inventory.csv";
         CityDataCollector collector = new CityDataCollector();
         ArrayList<Document> list = new ArrayList<>();
 
@@ -74,12 +75,14 @@ public class CityDataSource implements Source<Document>{
 
                 if(counter % 10000 == 0){
                     System.out.println("Saving to mongo");
-                    collector.save(list);
+                    ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
+                    collector.save(mungedList);
                     list = new ArrayList<>();
                 }
             }
-
-            collector.save(list);
+            
+            ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
+            collector.save(mungedList);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

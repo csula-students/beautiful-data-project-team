@@ -106,7 +106,15 @@ public class cdcSource implements Source<Document>{
         Collection<Document> list = new ArrayList<>();
         createHashMaps();
 
-        String csvFile = "C:\\Users\\jwj96\\Downloads\\DeathRecords\\DeathRecords.csv";
+        String csvFile = "/Users/andrewgarcia/Documents/DeathRecords/DeathRecords.csv";
+//        File file = new File(csvFile);
+//        if(file.exists()){
+//        	System.out.println("exists");
+//        }
+//        else{
+//        	System.out.println("not exists");
+//        }
+        
         boolean header = true;
         try {
             Reader in = new FileReader(csvFile);
@@ -132,14 +140,18 @@ public class cdcSource implements Source<Document>{
                         //System.out.println(column + ": " + record.get(column));
                     }
                 }
+                
                 list.add(doc);
 
                 if(list.size() % 10000 == 0){
-                    collector.save(list);
+                	ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
+                    collector.save(mungedList);
                     list = new ArrayList<>();
                 }
             }
-            collector.save(list);
+            
+            ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
+            collector.save(mungedList);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -150,7 +162,7 @@ public class cdcSource implements Source<Document>{
     }
 
     public static void createHashMaps() {
-        String csvDir = "C:\\Users\\jwj96\\Downloads\\DeathRecords\\";
+        String csvDir = "/Users/andrewgarcia/Documents/DeathRecords/";
         String file = null;
         BufferedReader br = null;
         String line;

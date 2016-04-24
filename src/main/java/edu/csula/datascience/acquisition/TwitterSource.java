@@ -17,6 +17,7 @@ public class TwitterSource implements Source<Status> {
     public TwitterSource(long minId, String query) {
         this.minId = minId;
         this.searchQuery = query;
+        
     }
 
     @Override

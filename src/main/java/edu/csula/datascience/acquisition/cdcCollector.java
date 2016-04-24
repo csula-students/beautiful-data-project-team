@@ -1,6 +1,7 @@
 package edu.csula.datascience.acquisition;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -13,6 +14,9 @@ import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Created by jwj96 on 4/21/2016.
@@ -25,7 +29,25 @@ public class cdcCollector implements Collector<Document, Document> {
 
     @Override
     public Collection<Document> mungee(Collection<Document> src) {
-        return null;
+    	List<Document> mungedList = Lists.newArrayList();
+    	
+    	for(Document doc : src){
+    		boolean addDoc = true;
+    		for(Entry<String, Object> entry : doc.entrySet()){
+    			if(entry.getValue() == null || entry.getValue() == ""){
+    				addDoc = false;
+    				break;
+    			}
+    			
+    		}
+    		
+    		if(addDoc){
+    			mungedList.add(doc);
+    		}
+    		
+    		
+    	}
+        return mungedList;
     }
 
     @Override

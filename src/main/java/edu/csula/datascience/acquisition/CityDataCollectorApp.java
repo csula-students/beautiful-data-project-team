@@ -11,7 +11,7 @@ public class CityDataCollectorApp {
     public static void main(String[] args) {
         CityDataSource source = new CityDataSource();
         Collection<Document> list = source.next();
-        CityDataCollector collector = new CityDataCollector();
+        //CityDataCollector collector = new CityDataCollector();
 
     }
 }
