@@ -152,6 +152,7 @@ public class cdcSource implements Source<Document>{
             
             ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
             collector.save(mungedList);
+            
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
