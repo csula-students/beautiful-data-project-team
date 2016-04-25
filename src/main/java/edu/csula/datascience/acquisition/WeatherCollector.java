@@ -1,11 +1,16 @@
 package edu.csula.datascience.acquisition;
 
+import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+
 import org.bson.Document;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Created by jwj96 on 4/23/2016.
@@ -17,7 +22,29 @@ public class WeatherCollector implements Collector<Document, Document>{
 
     @Override
     public Collection<Document> mungee(Collection<Document> src) {
-        return null;
+    	ArrayList<Document> mungedList = Lists.newArrayList();
+    	
+    	for(Document doc : src){
+    		boolean addDoc = true;
+    		for(Entry<String, Object> entry : doc.entrySet()){
+    			String colName = entry.getKey();
+    			String value = (String) entry.getValue();
+    			
+    			
+    			if(!value.equalsIgnoreCase("United States") || value.equals("")
+    					|| value == null){
+    				addDoc = false;
+    				break;
+    			}
+    			
+    		}
+    		
+    		if(addDoc){
+    			mungedList.add(doc);
+    		}
+    	}
+    	
+        return mungedList;
     }
 
     @Override

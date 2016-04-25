@@ -2,6 +2,8 @@ package edu.csula.datascience.acquisition;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.bson.Document;
@@ -10,201 +12,244 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by jwj96 on 4/23/2016.
  */
-public class cdcSource implements Source<Document>{
-    public static HashMap<String, HashMap> lookUpTable = new HashMap<>();
-    private int size;
+public class cdcSource implements Source<Document> {
+	public static HashMap<String, HashMap> lookUpTable = new HashMap<>();
+	private int size;
+	public static int currentIndex;
+	// private Iterable<CSVRecord> records;
+	// private LinkedList<CSVRecord> recordList;
+	private HashMap<Integer, CSVRecord> recordMap;
 
-    public cdcSource(){
-        size = Integer.MAX_VALUE;
-    }
+	public cdcSource() {
+		// records = null;
+		recordMap = Maps.newHashMap();
+		currentIndex = 0;
+		
+		//createHashMaps();
+		String csvFile = "/Users/andrewgarcia/Documents/DeathRecords/DeathRecords.csv";
+		
+		Reader in;
+		try {
+			in = new FileReader(csvFile);
+			System.out.println("open file reader");
 
-    private static String[] files = {
-            "ResidentStatus.csv",
-            "Education1989Revision.csv",
-            "Education2003Revision.csv",
-            "AgeType.csv",
-            "AgeRecode52.csv",
-            "AgeRecode27.csv",
-            "AgeRecode12.csv",
-            "InfantAgeRecode22.csv",
-            "PlaceOfDeathAndDecedentsStatus.csv",
-            "MaritalStatus.csv",
-            "DayOfWeekOfDeath.csv",
-            "Icd10Code.csv",
-            "MannerOfDeath.csv",
-            "MethodOfDisposition.csv",
-            "ActivityCode.csv",
-            "PlaceOfInjury.csv",
-            "Race.csv",
-            "BridgedRaceFlag.csv",
-            "RaceImputationFlag.csv",
-            "RaceRecode3.csv",
-            "RaceRecode5.csv",
-            "HispanicOrigin.csv",
-            "HispanicOriginRaceRecode.csv",
-            "EducationReportingFlag.csv",
-            //"EntityAxisConditions.csv",
-            //"RecordAxisConditions.csv",
+			Iterable<CSVRecord> records;
+			records = CSVFormat.EXCEL.withHeader(col).parse(in);
+			System.out.println("parsed records");
 
-    };
+			//System.out.println("Iterable size: " + Iterables.size(records));
+			int temp = currentIndex;
+			for(CSVRecord record : records){
+				System.out.println("creating map, index: " + temp);
+				recordMap.put(temp++, record);
+				
+			}
+			System.out.println("generated map");
+			
+			size = Iterables.size(records);
+			System.out.println("collection size: " + size);
 
-    static String[] col = {
-            "Id",
-            "ResidentStatus",
-            "Education1989Revision",
-            "Education2003Revision",
-            "EducationReportingFlag",
-            "MonthOfDeath",
-            "Sex",
-            "AgeType",
-            "Age",
-            "AgeSubstitutionFlag",
-            "AgeRecode52",
-            "AgeRecode27",
-            "AgeRecode12",
-            "InfantAgeRecode22",
-            "PlaceOfDeathAndDecedentsStatus",
-            "MaritalStatus",
-            "DayOfWeekOfDeath",
-            "CurrentDataYear",
-            "InjuryAtWork",
-            "MannerOfDeath",
-            "MethodOfDisposition",
-            "Autopsy",
-            "ActivityCode",
-            "PlaceOfInjury",
-            "Icd10Code",
-            "CauseRecode358",
-            "CauseRecode113",
-            "InfantCauseRecode130",
-            "CauseRecode39",
-            "NumberOfEntityAxisConditions",
-            "NumberOfRecordAxisConditions",
-            "Race",
-            "BridgedRaceFlag",
-            "RaceImputationFlag",
-            "RaceRecode3",
-            "RaceRecode5",
-            "HispanicOrigin",
-            "HispanicOriginRaceRecode",
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    };
+	}
 
-    @Override
-    public boolean hasNext() {
-        return size > 0;
-    }
+	// private void generateRecordMap(Iterable<CSVRecord> r){
+	//
+	// for(CSVRecord record : r){
+	//
+	// }
+	// }
 
-    @Override
-    public Collection<Document> next() {
-        Collector collector = new cdcCollector();
-        Collection<Document> list = new ArrayList<>();
-        createHashMaps();
+	private static String[] files = { "ResidentStatus.csv", "Education1989Revision.csv", "Education2003Revision.csv",
+			"AgeType.csv", "AgeRecode52.csv", "AgeRecode27.csv", "AgeRecode12.csv", "InfantAgeRecode22.csv",
+			"PlaceOfDeathAndDecedentsStatus.csv", "MaritalStatus.csv", "DayOfWeekOfDeath.csv", "Icd10Code.csv",
+			"MannerOfDeath.csv", "MethodOfDisposition.csv", "ActivityCode.csv", "PlaceOfInjury.csv", "Race.csv",
+			"BridgedRaceFlag.csv", "RaceImputationFlag.csv", "RaceRecode3.csv", "RaceRecode5.csv", "HispanicOrigin.csv",
+			"HispanicOriginRaceRecode.csv", "EducationReportingFlag.csv",
+			// "EntityAxisConditions.csv",
+			// "RecordAxisConditions.csv",
 
-        String csvFile = "/Users/andrewgarcia/Documents/DeathRecords/DeathRecords.csv";
-//        File file = new File(csvFile);
-//        if(file.exists()){
-//        	System.out.println("exists");
-//        }
-//        else{
-//        	System.out.println("not exists");
-//        }
-        
-        boolean header = true;
-        try {
-            Reader in = new FileReader(csvFile);
-            Iterable<CSVRecord> records = CSVFormat.EXCEL.withHeader(col).parse(in);
+	};
 
-            for (CSVRecord record : records) {
-                // Skip first line
-                if (header) {
-                    header = false;
-                    continue;
-                }
+	static String[] col = { "Id", "ResidentStatus", "Education1989Revision", "Education2003Revision",
+			"EducationReportingFlag", "MonthOfDeath", "Sex", "AgeType", "Age", "AgeSubstitutionFlag", "AgeRecode52",
+			"AgeRecode27", "AgeRecode12", "InfantAgeRecode22", "PlaceOfDeathAndDecedentsStatus", "MaritalStatus",
+			"DayOfWeekOfDeath", "CurrentDataYear", "InjuryAtWork", "MannerOfDeath", "MethodOfDisposition", "Autopsy",
+			"ActivityCode", "PlaceOfInjury", "Icd10Code", "CauseRecode358", "CauseRecode113", "InfantCauseRecode130",
+			"CauseRecode39", "NumberOfEntityAxisConditions", "NumberOfRecordAxisConditions", "Race", "BridgedRaceFlag",
+			"RaceImputationFlag", "RaceRecode3", "RaceRecode5", "HispanicOrigin", "HispanicOriginRaceRecode",
 
-                Document doc = new Document();
-                for (int i = 0; i < col.length; i++) {
-                    String column = col[i];
-                    System.out.println(record.get("Id"));
-                    if (lookUpTable.containsKey(column)) {
-                        HashMap<String, String> map = lookUpTable.get(column);
-                        doc.append(column, map.get(record.get(column)));
-                        //System.out.println(column + ": " + map.get(record.get(column)));
-                    } else {
-                        doc.append(column, record.get(column));
-                        //System.out.println(column + ": " + record.get(column));
-                    }
-                }
-                
-                list.add(doc);
+	};
 
-                if(list.size() % 10000 == 0){
-                	ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
-                    collector.save(mungedList);
-                    list = new ArrayList<>();
-                }
-            }
-            
-            ArrayList<Document> mungedList = (ArrayList<Document>) collector.mungee(list);
-            collector.save(mungedList);
-            
+	@Override
+	public boolean hasNext() {
+		return size > 0;
+	}
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+	@Override
+	public Collection<Document> next() {
+		System.out.println("Getting next record");
+		Collection<Document> list = new ArrayList<>();
+		createHashMaps();
 
-    public static void createHashMaps() {
-        String csvDir = "/Users/andrewgarcia/Documents/DeathRecords/";
-        String file = null;
-        BufferedReader br = null;
-        String line;
+//		String csvFile = "/Users/andrewgarcia/Documents/DeathRecords/DeathRecords.csv";
+//		Reader in;
+//		try {
+//			in = new FileReader(csvFile);
+//			System.out.println("open file reader");
+//
+//			Iterable<CSVRecord> records;
+//			records = CSVFormat.EXCEL.withHeader(col).parse(in);
+//
+//			for (CSVRecord record : records) {
+//				Document doc = new Document();
+//				for (int j = 0; j < col.length; j++) {
+//					String column = col[j];
+//					System.out.println(record.get("Id"));
+//					if (lookUpTable.containsKey(column)) {
+//						HashMap<String, String> map = lookUpTable.get(column);
+//						doc.append(column, map.get(record.get(column)));
+//						// System.out.println(column + ": " +
+//						// map.get(record.get(column)));
+//					} else {
+//						doc.append(column, record.get(column));
+//						System.out.println("record" + record);
+//						// System.out.println(column + ": " +
+//						// record.get(column));
+//					}
+//				}
+//
+//				list.add(doc);
+//			}
+//
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
-        for (int i = 0; i < files.length; i++) {
-            file = files[i];
-            String fullPath = csvDir + file;
+		// File file = new File(csvFile);
+		// if(file.exists()){
+		// System.out.println("exists");
+		// }
+		// else{
+		// System.out.println("not exists");
+		// }
 
+		// for(CSVRecord record : records){
+		// if(currentIndex < temp + 10000){
+		// size--;
+		// System.out.println("current index: " + currentIndex);
+		// System.out.println("size: " + size);
+		// System.out.println(record + " record");
+		//
+		// Document doc = new Document();
+		// for (int j = 0; j < col.length; j++) {
+		// String column = col[j];
+		// System.out.println(record.get("Id"));
+		// if (lookUpTable.containsKey(column)) {
+		// HashMap<String, String> map = lookUpTable.get(column);
+		// doc.append(column, map.get(record.get(column)));
+		// // System.out.println(column + ": " +
+		// // map.get(record.get(column)));
+		// } else {
+		// doc.append(column, record.get(column));
+		// // System.out.println(column + ": " +
+		// // record.get(column));
+		// }
+		// }
+		//
+		// list.add(doc);
+		// }
+		// }
 
-            try {
-                //System.out.println("Parsing " + file);
-                br = new BufferedReader(new FileReader(fullPath));
-                HashMap<String, String> infoHashMap = new HashMap<>();
-                while ((line = br.readLine()) != null) {
+		int temp = currentIndex;
 
-                    // use comma as separator
-                    String[] input = line.split(",");
-                    infoHashMap.put(input[0], input[1]);
+		for (; currentIndex < temp + 10000; currentIndex++) {
+			// System.out.println("i: " + i);
+			size--;
+			System.out.println("current index: " + currentIndex);
+			System.out.println("size: " + size);
 
-                }
-                lookUpTable.put(file.substring(0, file.indexOf('.')), infoHashMap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (br != null) {
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
+			CSVRecord record = recordMap.get(currentIndex);
+			System.out.println(record + " record");
 
-        System.out.println("Finished creating hashmaps");
-    }
+			Document doc = new Document();
+			for (int j = 0; j < col.length; j++) {
+				String column = col[j];
+				System.out.println(record.get("Id"));
+				if (lookUpTable.containsKey(column)) {
+					HashMap<String, String> map = lookUpTable.get(column);
+					doc.append(column, map.get(record.get(column)));
+					// System.out.println(column + ": " +
+					// map.get(record.get(column)));
+				} else {
+					doc.append(column, record.get(column));
+					// System.out.println(column + ": " +
+					// record.get(column));
+				}
+			}
 
+			list.add(doc);
 
+		}
 
+		return list;
+	}
 
+	public static void createHashMaps() {
+		String csvDir = "/Users/andrewgarcia/Documents/DeathRecords/";
+		String file = null;
+		BufferedReader br = null;
+		String line;
+
+		for (int i = 0; i < files.length; i++) {
+			file = files[i];
+			String fullPath = csvDir + file;
+
+			try {
+				// System.out.println("Parsing " + file);
+				br = new BufferedReader(new FileReader(fullPath));
+				HashMap<String, String> infoHashMap = new HashMap<>();
+				while ((line = br.readLine()) != null) {
+
+					// use comma as separator
+					String[] input = line.split(",");
+					infoHashMap.put(input[0], input[1]);
+
+				}
+				lookUpTable.put(file.substring(0, file.indexOf('.')), infoHashMap);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		System.out.println("Finished creating hashmaps");
+	}
 
 }

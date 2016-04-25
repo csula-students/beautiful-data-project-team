@@ -12,7 +12,13 @@ import java.util.Collection;
 public class cdcCollectorApp {
     public static void main(String[] args) {
         cdcSource source = new cdcSource();
-        Collection<Document> list = source.next();
+        
+        while(source.hasNext()){
+        	Collection<Document> list = source.next();
+        }
+//        source.next();
+        	
+        //source.next();
         //cdcCollector collector = new cdcCollector();
         //collector.save(list);
 
