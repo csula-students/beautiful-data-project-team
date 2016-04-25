@@ -30,12 +30,17 @@ public class WeatherCollector implements Collector<Document, Document>{
     			String colName = entry.getKey();
     			String value = (String) entry.getValue();
     			
-    			
-    			if(!value.equalsIgnoreCase("United States") || value.equals("")
-    					|| value == null){
+    			if(value == null || !value.equalsIgnoreCase("United States") ||  value.equals("")){
     				addDoc = false;
     				break;
     			}
+    			
+    			
+//    			if(!value.equalsIgnoreCase("United States") || value.equals("")
+//    					|| value == null){
+//    				addDoc = false;
+//    				break;
+//    			}
     			
     		}
     		
